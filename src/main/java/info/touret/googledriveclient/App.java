@@ -27,6 +27,8 @@ import static info.touret.googledriveclient.GoogleOAuthHelper.getGoogleCredentia
  */
 public class App {
     private final static String ACCESS_TOKEN = "ya29.ewEyfPUP13Oljkew-XU023xvSZDinH_W4AcfFzc3DAk6O81g7meyL25CZZsAOAC0FaQHonSjnif-HA";
+    public static final String GOOGLE_DRIVE_FOLDER = "GoogleDrive";
+    public static final String FOLDER_DIRECTORY = "f";
 
     private static Options createOptions() {
         Options options = new Options();
@@ -46,9 +48,8 @@ public class App {
         GoogleDriveHelper googleDriveHelper = new GoogleDriveHelper();
         try {
             final CommandLine commandLine = commandLineParser.parse(options, args);
-
-            Path gdriveFolder = Paths.get(commandLine.getOptionValue("folder"),"GoogleDrive");
-            if(Files.exists(gdriveFolder)){
+            Path gdriveFolder = Paths.get(commandLine.getOptionValue(FOLDER_DIRECTORY), GOOGLE_DRIVE_FOLDER);
+            if(!Files.exists(gdriveFolder)){
                 System.err.println("Le repertoire "+gdriveFolder.toString()+" existe");
                 System.exit(-1);
             }
@@ -68,27 +69,7 @@ public class App {
             // sync
             Drive service = googleDriveHelper.buildDrive(httpTransport,jsonFactory,credential);
             GoogleDriveClient googleDriveClient = new GoogleDriveClient();
-            googleDriveClient.synchronize(service, Paths.get(commandLine.getOptionValue("f")));
-//            FileList files = service.files().list().execute();
-//            for (File current : files.getItems()) {
-//                System.out.println("_____________________________");
-//                System.out.println(current.getTitle());
-//                System.out.println(current.getKind());
-//                System.out.println(current.getModifiedByMeDate());
-//                System.out.println(current.getFileExtension());
-//
-//            }
-            //ParentList folders = service.parents().list("root").execute();
-
-
-
-//
-//            FileList folders = service.files().list().setQ("mimeType = 'application/vnd.google-apps.folder' ").execute();
-//            for (File folder : folders.getItems()) {
-//                System.out.println("Folder : " + folder.getId());
-//                System.out.println("Folder : " + folder.getTitle());
-//            }
-
+            googleDriveClient.synchronize(service, gdriveFolder);
 
 
 

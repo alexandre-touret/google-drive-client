@@ -20,6 +20,10 @@ import java.util.List;
  * Created by touret-a on 22/05/2015.
  */
 public class GoogleDriveHelper {
+
+    public static final String APPLICATION_VND_GOOGLE_APPS_FOLDER = "application/vnd.google-apps.folder";
+    public static final String APPLICATION_VND_GOOGLE_APPS = "application/vnd.google-apps";
+
     public List<File> listFolders(Drive drive, String root) throws IOException {
         List<File> files = new ArrayList<>();
         ChildList childList = drive.children().list(root).setQ("mimeType = 'application/vnd.google-apps.folder' ").execute();
@@ -32,13 +36,13 @@ public class GoogleDriveHelper {
         return files;
     }
 
-    public List<File> listFilesOfAFolder(Drive drive, String root) throws IOException {
+    public List<File> listRealFilesOfAFolder(Drive drive, String root) throws IOException {
         List<File> files = new ArrayList<>();
         ChildList childList = drive.children().list(root).execute();
         for (ChildReference children : childList.getItems()) {
 
             final File file = drive.files().get(children.getId()).execute();
-            if (!file.getMimeType().equals("application/vnd.google-apps.folder")) {
+            if (!file.getMimeType().startsWith(APPLICATION_VND_GOOGLE_APPS)) {
                 files.add(file);
             }
         }

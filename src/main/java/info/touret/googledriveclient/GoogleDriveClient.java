@@ -17,8 +17,10 @@ public class GoogleDriveClient {
         LocalFileHelper localFileHelper = new LocalFileHelper();
 
         try {
-            List<File> files = googleDriveHelper.listFilesOfAFolder(drive, "root");
+            List<File> files = googleDriveHelper.listRealFilesOfAFolder(drive, "root");
             for(File file : files){
+
+                System.out.println("Checking "+file.getTitle());
                 Path fileToCheck = Paths.get(folder.toString(),file.getTitle().concat(".").concat(file.getFileExtension()));
                 if( isNewOrMoreRecentInGoogleDrive(file,fileToCheck.toFile())){
                     googleDriveHelper.downloadFile(drive,file,folder);
@@ -32,6 +34,6 @@ public class GoogleDriveClient {
     }
 
     private Boolean isNewOrMoreRecentInGoogleDrive(File gdriveFile, java.io.File localFile) {
-        return localFile.exists() && localFile.lastModified()>gdriveFile.getModifiedDate().getValue();
+        return !localFile.exists() || localFile.lastModified()<gdriveFile.getModifiedDate().getValue();
     }
 }
