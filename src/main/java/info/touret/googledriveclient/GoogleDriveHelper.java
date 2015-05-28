@@ -15,12 +15,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by touret-a on 22/05/2015.
  */
 public class GoogleDriveHelper {
 
+
+    private final static Logger LOGGER = Logger.getLogger(GoogleDriveHelper.class.getName());
     public static final String APPLICATION_VND_GOOGLE_APPS_FOLDER = "application/vnd.google-apps.folder";
     public static final String APPLICATION_VND_GOOGLE_APPS = "application/vnd.google-apps";
 
@@ -31,7 +35,7 @@ public class GoogleDriveHelper {
         for (ChildReference children : childList.getItems()) {
             final File file = drive.files().get(children.getId()).execute();
             files.add(file);
-            System.out.println("Folder trouvé : " + file.getTitle());
+            LOGGER.fine("Folder trouvé : " + file.getTitle());
         }
         return files;
     }
@@ -40,7 +44,6 @@ public class GoogleDriveHelper {
         List<File> files = new ArrayList<>();
         ChildList childList = drive.children().list(root).execute();
         for (ChildReference children : childList.getItems()) {
-
             final File file = drive.files().get(children.getId()).execute();
             if (!file.getMimeType().startsWith(APPLICATION_VND_GOOGLE_APPS)) {
                 files.add(file);
@@ -55,12 +58,12 @@ public class GoogleDriveHelper {
         try {
             newFile = Files.createFile(newFile);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
         try (FileOutputStream outputStream = new FileOutputStream(newFile.toFile())) {
             drive.files().get(gdriveFile.getId()).executeMediaAndDownloadTo(outputStream);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
     }
 

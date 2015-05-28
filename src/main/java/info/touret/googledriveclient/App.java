@@ -17,8 +17,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import static info.touret.googledriveclient.GoogleOAuthHelper.getGoogleCredential;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 ;
 
@@ -30,10 +31,12 @@ public class App {
     public static final String GOOGLE_DRIVE_FOLDER = "GoogleDrive";
     public static final String FOLDER_DIRECTORY = "f";
 
+    private final static Logger LOGGER = Logger.getLogger(App.class.getName());
+
     private static Options createOptions() {
         Options options = new Options();
-        options.addOption("a",false,"authorization");
-        options.addOption("f",true,"folder");
+        options.addOption("a", false, "authorization");
+        options.addOption("f", true, "folder");
 //        options.addOption(OptionBuilder.withwithArgName("a").hasArg().withDescription("authorization").create("authorization"));
 //        options.addOption(OptionBuilder.withLongOpt()withArgName("FOLDER").hasArg().isRequired().withDescription("Google Drive Local Folder").create("folder"));
         return options;
@@ -45,12 +48,13 @@ public class App {
 
         CommandLineParser commandLineParser = new BasicParser();
 
+
         GoogleDriveHelper googleDriveHelper = new GoogleDriveHelper();
         try {
             final CommandLine commandLine = commandLineParser.parse(options, args);
             Path gdriveFolder = Paths.get(commandLine.getOptionValue(FOLDER_DIRECTORY), GOOGLE_DRIVE_FOLDER);
-            if(!Files.exists(gdriveFolder)){
-                System.err.println("Le repertoire "+gdriveFolder.toString()+" existe");
+            if (!Files.exists(gdriveFolder)) {
+                LOGGER.severe("Le repertoire " + gdriveFolder.toString() + " existe");
                 System.exit(-1);
             }
 
@@ -61,22 +65,27 @@ public class App {
             JsonFactory jsonFactory = new JacksonFactory();
             // gestion du token
             GoogleCredential credential = null;
+            GoogleOAuthHelper googleOAuthHelper = new GoogleOAuthHelper(gdriveFolder);
             if (commandLine.hasOption("a")) {
-                credential = getGoogleCredential(httpTransport, jsonFactory);
+                credential = googleOAuthHelper.getGoogleCredential(httpTransport, jsonFactory);
+                googleOAuthHelper.storeCredentialInConfigFile( credential.getAccessToken());
             } else {
-                credential = new GoogleCredential().setAccessToken(ACCESS_TOKEN);
+                Optional<String> token = googleOAuthHelper.getAccessToken();
+                if (!token.isPresent()) {
+                    LOGGER.severe("Unable to load Google Credentials");
+                    System.exit(-1);
+                }
+
+                credential = new GoogleCredential().setAccessToken(token.get());
             }
             // sync
-            Drive service = googleDriveHelper.buildDrive(httpTransport,jsonFactory,credential);
+            Drive service = googleDriveHelper.buildDrive(httpTransport, jsonFactory, credential);
             GoogleDriveClient googleDriveClient = new GoogleDriveClient();
             googleDriveClient.synchronize(service, gdriveFolder);
 
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
+        }
+        catch (IOException | ParseException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
     }
 
