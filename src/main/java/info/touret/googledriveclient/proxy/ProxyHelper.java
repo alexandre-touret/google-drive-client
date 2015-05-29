@@ -1,4 +1,4 @@
-package info.touret.googledriveclient;
+package info.touret.googledriveclient.proxy;
 
 import org.apache.commons.codec.binary.Base64;
 

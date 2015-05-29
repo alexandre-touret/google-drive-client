@@ -1,4 +1,4 @@
-package info.touret.googledriveclient;
+package info.touret.googledriveclient.proxy;
 
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
