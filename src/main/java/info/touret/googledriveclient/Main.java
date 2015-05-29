@@ -10,6 +10,7 @@ import com.google.api.services.drive.Drive;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
@@ -24,19 +25,28 @@ import java.util.logging.Logger;
 ;
 
 /**
- * Hello world!
+ * Application principale
  */
-public class App {
+public class Main {
     private final static String ACCESS_TOKEN = "ya29.ewEyfPUP13Oljkew-XU023xvSZDinH_W4AcfFzc3DAk6O81g7meyL25CZZsAOAC0FaQHonSjnif-HA";
     public static final String GOOGLE_DRIVE_FOLDER = "GoogleDrive";
     public static final String FOLDER_DIRECTORY = "f";
 
-    private final static Logger LOGGER = Logger.getLogger(App.class.getName());
+    private final static Logger LOGGER = Logger.getLogger(Main.class.getName());
 
+    /**
+     * @return les options
+     */
     private static Options createOptions() {
         Options options = new Options();
         options.addOption("a", false, "authorization");
         options.addOption("f", true, "folder");
+        options.addOption("p", false, "proxy");
+
+        options.addOption(OptionBuilder.withArgName("host").hasArg(true).withDescription("Proxy Host").create("proxy_host"));
+        options.addOption(OptionBuilder.withArgName("port").hasArg(true).withDescription("Proxy Port").create("proxy_port"));
+        options.addOption(OptionBuilder.withArgName("user").hasArg(true).withDescription("Proxy User").create("proxy_user"));
+        options.addOption(OptionBuilder.withArgName("password").hasArg(true).withDescription("Proxy password").create("proxy_password"));
 //        options.addOption(OptionBuilder.withwithArgName("a").hasArg().withDescription("authorization").create("authorization"));
 //        options.addOption(OptionBuilder.withLongOpt()withArgName("FOLDER").hasArg().isRequired().withDescription("Google Drive Local Folder").create("folder"));
         return options;
@@ -52,15 +62,11 @@ public class App {
         GoogleDriveHelper googleDriveHelper = new GoogleDriveHelper();
         try {
             final CommandLine commandLine = commandLineParser.parse(options, args);
-            Path gdriveFolder = Paths.get(commandLine.getOptionValue(FOLDER_DIRECTORY), GOOGLE_DRIVE_FOLDER);
-            if (!Files.exists(gdriveFolder)) {
-                LOGGER.severe("Le repertoire " + gdriveFolder.toString() + " existe");
-                System.exit(-1);
-            }
 
-            // proxy
-            ProxyHelper proxyHelper = new ProxyHelper(true, true, "8080", "pcc37cti1", "userappli1", "abcd.1234");
-            proxyHelper.setUpProxy();
+            Path gdriveFolder = Paths.get(commandLine.getOptionValue(FOLDER_DIRECTORY), GOOGLE_DRIVE_FOLDER);
+            checkGoogleDriveFolder(commandLine, gdriveFolder);
+            checkAndConfigureProxy(commandLine);
+
             HttpTransport httpTransport = new NetHttpTransport();
             JsonFactory jsonFactory = new JacksonFactory();
             // gestion du token
@@ -68,7 +74,7 @@ public class App {
             GoogleOAuthHelper googleOAuthHelper = new GoogleOAuthHelper(gdriveFolder);
             if (commandLine.hasOption("a")) {
                 credential = googleOAuthHelper.getGoogleCredential(httpTransport, jsonFactory);
-                googleOAuthHelper.storeCredentialInConfigFile( credential.getAccessToken());
+                googleOAuthHelper.storeCredentialInConfigFile(credential.getAccessToken());
             } else {
                 Optional<String> token = googleOAuthHelper.getAccessToken();
                 if (!token.isPresent()) {
@@ -83,9 +89,39 @@ public class App {
             GoogleDriveClient googleDriveClient = new GoogleDriveClient();
             googleDriveClient.synchronize(service, gdriveFolder);
 
-        }
-        catch (IOException | ParseException e) {
+        } catch (IOException | ParseException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+    }
+
+    private static void checkAndConfigureProxy(CommandLine commandLine) {
+        if (commandLine.hasOption("p")) {
+            // proxy
+            LOGGER.fine("Proxy Configuration ...");
+            ProxyHelper proxyHelper = new ProxyHelper(true, true, commandLine.getOptionValue("proxy_port"),
+                                                commandLine.getOptionValue("proxy_host"),
+                                                commandLine.getOptionValue("proxy_user"),
+                                                commandLine.getOptionValue("proxy_password"));
+            proxyHelper.setUpProxy();
+        }
+    }
+
+    /**
+     * Checks the folder passed in the main method
+     * Beware, this method could do a System.exit() if the folder doesn't exist
+     * @param commandLine
+     * @param gdriveFolder
+     * @throws IOException
+     */
+    private static void checkGoogleDriveFolder(CommandLine commandLine, Path gdriveFolder) throws IOException {
+        if(!Files.exists(Paths.get(commandLine.getOptionValue(FOLDER_DIRECTORY)))){
+            LOGGER.warning("This folder [" + commandLine.getOptionValue(FOLDER_DIRECTORY) + "] doesn't exist ");
+            System.exit(-1);
+        }
+        if (!Files.exists(gdriveFolder)) {
+            LOGGER.warning("This folder [" + commandLine.getOptionValue(FOLDER_DIRECTORY) + "] doesn't exist or the folder ["+gdriveFolder+"]is already exists");
+            LOGGER.warning("Creating folder ["+gdriveFolder+"]");
+            Files.createDirectory(gdriveFolder);
         }
     }
 
