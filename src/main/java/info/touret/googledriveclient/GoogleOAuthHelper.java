@@ -76,7 +76,7 @@ public class GoogleOAuthHelper {
             Files.deleteIfExists(confFile);
             Files.createFile(confFile);
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Unable to remove the confif file ", e);
+            LOGGER.log(Level.SEVERE, "Unable to remove the config file ", e);
             throw new GoogleDriveException(e);
         }
     }

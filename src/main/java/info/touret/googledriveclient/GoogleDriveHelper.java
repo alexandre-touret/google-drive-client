@@ -35,7 +35,7 @@ public class GoogleDriveHelper {
         for (ChildReference children : childList.getItems()) {
             final File file = drive.files().get(children.getId()).execute();
             files.add(file);
-            LOGGER.fine("Folder trouvé : " + file.getTitle());
+            LOGGER.fine("Folder founded : " + file.getTitle());
         }
         return files;
     }
@@ -59,18 +59,17 @@ public class GoogleDriveHelper {
             newFile = Files.createFile(newFile);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            throw new GoogleDriveException(e);
         }
         try (FileOutputStream outputStream = new FileOutputStream(newFile.toFile())) {
             drive.files().get(gdriveFile.getId()).executeMediaAndDownloadTo(outputStream);
-        } catch (Exception e) {
+        } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            throw new GoogleDriveException(e);
         }
     }
 
     public Drive buildDrive(HttpTransport httpTransport, JsonFactory jsonFactory, GoogleCredential credential) {
         return new Drive.Builder(httpTransport, jsonFactory, credential).setApplicationName("googledriveclient").build();
     }
-
-
-
 }

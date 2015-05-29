@@ -7,11 +7,15 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
+
+import static java.util.logging.Level.SEVERE;
 
 /**
  * Created by touret-a on 22/05/2015.
  */
 public class LocalFileHelper {
+    private final static Logger LOGGER = Logger.getLogger(LocalFileHelper.class.getName());
 
     public List<File> listRecentFilesFromAFolder(Path path, Instant instant) {
         List<File> files = new ArrayList<>();
@@ -20,11 +24,11 @@ public class LocalFileHelper {
                     .filter((p) -> Instant.ofEpochMilli(p.toFile().lastModified()).isAfter(instant))
                     .forEach((p) -> files.add(p.toFile()));
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(SEVERE, e.getMessage(), e);
+            throw new GoogleDriveException(e);
         }
         return files;
     }
-
 
 
 }

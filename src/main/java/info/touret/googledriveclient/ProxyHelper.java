@@ -5,6 +5,7 @@ import org.apache.commons.codec.binary.Base64;
 import java.net.Authenticator;
 
 /**
+ *
  * Created by touret-a on 20/05/2015.
  */
 public class ProxyHelper {

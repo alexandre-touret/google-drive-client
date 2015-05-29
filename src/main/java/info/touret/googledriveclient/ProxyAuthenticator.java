@@ -4,6 +4,7 @@ import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 
 /**
+ * Gere l'identification aupres du proxy
  * Created by touret-a on 20/05/2015.
  */
 public class ProxyAuthenticator extends Authenticator{

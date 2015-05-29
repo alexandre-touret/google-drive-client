@@ -58,7 +58,6 @@ public class Main {
 
         CommandLineParser commandLineParser = new BasicParser();
 
-
         GoogleDriveHelper googleDriveHelper = new GoogleDriveHelper();
         try {
             final CommandLine commandLine = commandLineParser.parse(options, args);
@@ -81,7 +80,6 @@ public class Main {
                     LOGGER.severe("Unable to load Google Credentials");
                     System.exit(-1);
                 }
-
                 credential = new GoogleCredential().setAccessToken(token.get());
             }
             // sync
@@ -91,17 +89,22 @@ public class Main {
 
         } catch (IOException | ParseException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            throw new GoogleDriveException(e);
         }
     }
 
+    /**
+     * Verifie et configure si besoin le proxy
+     * @param commandLine
+     */
     private static void checkAndConfigureProxy(CommandLine commandLine) {
         if (commandLine.hasOption("p")) {
             // proxy
             LOGGER.fine("Proxy Configuration ...");
             ProxyHelper proxyHelper = new ProxyHelper(true, true, commandLine.getOptionValue("proxy_port"),
-                                                commandLine.getOptionValue("proxy_host"),
-                                                commandLine.getOptionValue("proxy_user"),
-                                                commandLine.getOptionValue("proxy_password"));
+                    commandLine.getOptionValue("proxy_host"),
+                    commandLine.getOptionValue("proxy_user"),
+                    commandLine.getOptionValue("proxy_password"));
             proxyHelper.setUpProxy();
         }
     }
@@ -109,18 +112,19 @@ public class Main {
     /**
      * Checks the folder passed in the main method
      * Beware, this method could do a System.exit() if the folder doesn't exist
+     *
      * @param commandLine
      * @param gdriveFolder
      * @throws IOException
      */
     private static void checkGoogleDriveFolder(CommandLine commandLine, Path gdriveFolder) throws IOException {
-        if(!Files.exists(Paths.get(commandLine.getOptionValue(FOLDER_DIRECTORY)))){
+        if (!Files.exists(Paths.get(commandLine.getOptionValue(FOLDER_DIRECTORY)))) {
             LOGGER.warning("This folder [" + commandLine.getOptionValue(FOLDER_DIRECTORY) + "] doesn't exist ");
             System.exit(-1);
         }
         if (!Files.exists(gdriveFolder)) {
-            LOGGER.warning("This folder [" + commandLine.getOptionValue(FOLDER_DIRECTORY) + "] doesn't exist or the folder ["+gdriveFolder+"]is already exists");
-            LOGGER.warning("Creating folder ["+gdriveFolder+"]");
+            LOGGER.warning("This folder [" + commandLine.getOptionValue(FOLDER_DIRECTORY) + "] doesn't exist or the folder [" + gdriveFolder + "]is already exists");
+            LOGGER.warning("Creating folder [" + gdriveFolder + "]");
             Files.createDirectory(gdriveFolder);
         }
     }
