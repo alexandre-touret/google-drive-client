@@ -17,8 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by touret-a on 22/05/2015.
@@ -69,4 +68,12 @@ public class LocalFileHelperTest {
         assertTrue(!fileList.isEmpty());
         assertEquals(1, fileList.size());
     }
+
+    public void testCreateOrGetFolder_OK() throws Exception {
+        Path mockPath1 = PowerMockito.mock(Path.class);
+        String mockDir = "test";
+        Path newPath = localFileHelper.createOrGetFolder(mockPath1, mockDir);
+        assertNotNull(newPath);
+    }
+
 }

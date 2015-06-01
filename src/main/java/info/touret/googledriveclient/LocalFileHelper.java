@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,5 +31,16 @@ public class LocalFileHelper {
         return files;
     }
 
+    public Path createOrGetFolder(Path rootFolder, String newFolder) {
+        Path folder = null;
+        try {
+            final Path dir = Paths.get(rootFolder.toString(), newFolder);
+            Files.createDirectory(dir);
+        } catch (IOException e) {
+            LOGGER.log(SEVERE, e.getMessage(), e);
+            throw new GoogleDriveException(e);
+        }
+        return folder;
+    }
 
 }

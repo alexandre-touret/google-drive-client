@@ -29,11 +29,25 @@ public class GoogleDriveClient {
         synchronizeGoogleDriveFolder(drive, folder, ROOT_FOLDER, new GoogleDriveHelper(), new LocalFileHelper());
     }
 
+    /**
+     * Indique si un fichier et plus recent dans google drive
+     *
+     * @param gdriveFile
+     * @param localFile
+     * @return
+     */
     private Boolean isNewOrMoreRecentInGoogleDrive(File gdriveFile, java.io.File localFile) {
         return !localFile.exists() || localFile.lastModified() < gdriveFile.getModifiedDate().getValue();
     }
 
 
+    /**
+     * @param drive
+     * @param localFolder
+     * @param gdriveFolder
+     * @param googleDriveHelper
+     * @param localFileHelper
+     */
     private void synchronizeGoogleDriveFolder(Drive drive, Path localFolder, String gdriveFolder, GoogleDriveHelper googleDriveHelper, LocalFileHelper localFileHelper) {
 
         try {
@@ -47,13 +61,22 @@ public class GoogleDriveClient {
                     LOGGER.fine("Downloaded file : [" + fileToCheck.toString() + " ]");
                 }
             }
-            /* On gere les repertoires */
+        } catch (InvalidPathException e1) {
+            LOGGER.log(Level.WARNING, e1.getMessage());
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            throw new GoogleDriveException(e);
+        }
+
+
+        try {
+          /* On gere les repertoires */
             List<File> folders = googleDriveHelper.listFolders(drive, gdriveFolder);
             for (File currentFolder : folders) {
                 LOGGER.info(currentFolder.getId());
+                Path newFolder = localFileHelper.createOrGetFolder(localFolder, currentFolder.getTitle());
+                synchronizeGoogleDriveFolder(drive, newFolder, currentFolder.getId(), googleDriveHelper, localFileHelper);
             }
-        } catch (InvalidPathException e1) {
-            LOGGER.log(Level.WARNING, e1.getMessage());
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new GoogleDriveException(e);

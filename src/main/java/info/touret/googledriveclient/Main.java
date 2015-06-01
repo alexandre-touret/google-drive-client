@@ -16,11 +16,13 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 ;
@@ -29,10 +31,9 @@ import java.util.logging.Logger;
  * Application principale
  */
 public class Main {
-    private final static String ACCESS_TOKEN = "ya29.ewEyfPUP13Oljkew-XU023xvSZDinH_W4AcfFzc3DAk6O81g7meyL25CZZsAOAC0FaQHonSjnif-HA";
     public static final String GOOGLE_DRIVE_FOLDER = "GoogleDrive";
     public static final String FOLDER_DIRECTORY = "f";
-
+    private final static String ACCESS_TOKEN = "ya29.ewEyfPUP13Oljkew-XU023xvSZDinH_W4AcfFzc3DAk6O81g7meyL25CZZsAOAC0FaQHonSjnif-HA";
     private final static Logger LOGGER = Logger.getLogger(Main.class.getName());
 
     /**
@@ -55,6 +56,7 @@ public class Main {
 
 
     public static void main(String[] args) {
+        init();
         Options options = createOptions();
 
         CommandLineParser commandLineParser = new BasicParser();
@@ -130,5 +132,12 @@ public class Main {
         }
     }
 
-
+    private static void init() {
+        try (InputStream input = Main.class.getResourceAsStream("/logging.properties")) {
+            LogManager.getLogManager().readConfiguration(input);
+        } catch (IOException e) {
+            // Ne devrait pas arriver
+            e.printStackTrace();
+        }
+    }
 }
