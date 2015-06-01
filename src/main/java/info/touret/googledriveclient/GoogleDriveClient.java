@@ -26,18 +26,31 @@ public class GoogleDriveClient {
      * @param folder
      */
     public void synchronize(Drive drive, Path folder) {
-        GoogleDriveHelper googleDriveHelper = new GoogleDriveHelper();
-        LocalFileHelper localFileHelper = new LocalFileHelper();
+        synchronizeGoogleDriveFolder(drive, folder, ROOT_FOLDER, new GoogleDriveHelper(), new LocalFileHelper());
+    }
+
+    private Boolean isNewOrMoreRecentInGoogleDrive(File gdriveFile, java.io.File localFile) {
+        return !localFile.exists() || localFile.lastModified() < gdriveFile.getModifiedDate().getValue();
+    }
+
+
+    private void synchronizeGoogleDriveFolder(Drive drive, Path localFolder, String gdriveFolder, GoogleDriveHelper googleDriveHelper, LocalFileHelper localFileHelper) {
 
         try {
-            List<File> files = googleDriveHelper.listRealFilesOfAFolder(drive, ROOT_FOLDER);
+            /* On gere les fichiers contenus dans le repertoire */
+            List<File> files = googleDriveHelper.listRealFilesOfAFolder(drive, gdriveFolder);
             for (File file : files) {
                 LOGGER.fine("Checking [" + file.getTitle() + "] ...");
-                Path fileToCheck = Paths.get(folder.toString(), file.getTitle().concat(".").concat(file.getFileExtension()));
+                Path fileToCheck = Paths.get(localFolder.toString(), file.getTitle().concat(".").concat(file.getFileExtension()));
                 if (isNewOrMoreRecentInGoogleDrive(file, fileToCheck.toFile())) {
-                    googleDriveHelper.downloadFile(drive, file, folder);
+                    googleDriveHelper.downloadFile(drive, file, localFolder);
                     LOGGER.fine("Downloaded file : [" + fileToCheck.toString() + " ]");
                 }
+            }
+            /* On gere les repertoires */
+            List<File> folders = googleDriveHelper.listFolders(drive, gdriveFolder);
+            for (File currentFolder : folders) {
+                LOGGER.info(currentFolder.getId());
             }
         } catch (InvalidPathException e1) {
             LOGGER.log(Level.WARNING, e1.getMessage());
@@ -47,7 +60,4 @@ public class GoogleDriveClient {
         }
     }
 
-    private Boolean isNewOrMoreRecentInGoogleDrive(File gdriveFile, java.io.File localFile) {
-        return !localFile.exists() || localFile.lastModified() < gdriveFile.getModifiedDate().getValue();
-    }
 }

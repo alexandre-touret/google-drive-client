@@ -23,7 +23,6 @@ import java.util.logging.Logger;
  */
 public class GoogleDriveHelper {
 
-
     public static final String APPLICATION_VND_GOOGLE_APPS_FOLDER = "application/vnd.google-apps.folder";
     public static final String APPLICATION_VND_GOOGLE_APPS = "application/vnd.google-apps";
     private final static Logger LOGGER = Logger.getLogger(GoogleDriveHelper.class.getName());
