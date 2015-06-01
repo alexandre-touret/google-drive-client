@@ -53,6 +53,7 @@ public class LocalFileHelperTest {
 
     @Test
     public void testlistRecenFilesFromAFolder_Not_Empty() throws Exception {
+        /* Definition des mocks*/
         Path mockPath1 = PowerMockito.mock(Path.class);
         Path mockPath2 = PowerMockito.mock(Path.class);
         PowerMockito.when(mockPath1.toFile()).thenReturn(PowerMockito.mock(File.class));
@@ -63,6 +64,7 @@ public class LocalFileHelperTest {
         List<Path> files = new ArrayList<>();
         Collections.addAll(files,mockPath1,mockPath2);
         PowerMockito.when(Files.list(mockRootPath)).thenReturn(files.stream());
+        /* Execution de la methode */
         List<File> fileList=localFileHelper.listRecentFilesFromAFolder(mockRootPath, Instant.EPOCH);
         assertTrue(!fileList.isEmpty());
         assertEquals(1, fileList.size());

@@ -24,10 +24,18 @@ import java.util.logging.Logger;
 public class GoogleDriveHelper {
 
 
-    private final static Logger LOGGER = Logger.getLogger(GoogleDriveHelper.class.getName());
     public static final String APPLICATION_VND_GOOGLE_APPS_FOLDER = "application/vnd.google-apps.folder";
     public static final String APPLICATION_VND_GOOGLE_APPS = "application/vnd.google-apps";
+    private final static Logger LOGGER = Logger.getLogger(GoogleDriveHelper.class.getName());
 
+    /**
+     * Liste les repertoires
+     *
+     * @param drive
+     * @param root
+     * @return
+     * @throws IOException
+     */
     public List<File> listFolders(Drive drive, String root) throws IOException {
         List<File> files = new ArrayList<>();
         ChildList childList = drive.children().list(root).setQ("mimeType = 'application/vnd.google-apps.folder' ").execute();
@@ -40,6 +48,13 @@ public class GoogleDriveHelper {
         return files;
     }
 
+    /**
+     * Liste les fichiers qui ne sont pas des documents google
+     * @param drive
+     * @param root
+     * @return La liste des documents
+     * @throws IOException
+     */
     public List<File> listRealFilesOfAFolder(Drive drive, String root) throws IOException {
         List<File> files = new ArrayList<>();
         ChildList childList = drive.children().list(root).execute();
@@ -52,6 +67,12 @@ public class GoogleDriveHelper {
         return files;
     }
 
+    /**
+     * Telecharge un fichier donne
+     * @param drive
+     * @param gdriveFile
+     * @param folder
+     */
     public void downloadFile(Drive drive, File gdriveFile, Path folder) {
 
         Path newFile = Paths.get(folder.toString(), gdriveFile.getTitle().concat(".").concat(gdriveFile.getFileExtension()));

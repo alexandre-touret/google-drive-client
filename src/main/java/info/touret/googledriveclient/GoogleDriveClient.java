@@ -16,6 +16,7 @@ import java.util.logging.Logger;
  * Created by touret-a on 22/05/2015.
  */
 public class GoogleDriveClient {
+    public static final String ROOT_FOLDER = "root";
     private final static Logger LOGGER = Logger.getLogger(GoogleDriveClient.class.getName());
 
     /**
@@ -29,13 +30,13 @@ public class GoogleDriveClient {
         LocalFileHelper localFileHelper = new LocalFileHelper();
 
         try {
-            List<File> files = googleDriveHelper.listRealFilesOfAFolder(drive, "root");
+            List<File> files = googleDriveHelper.listRealFilesOfAFolder(drive, ROOT_FOLDER);
             for (File file : files) {
                 LOGGER.fine("Checking [" + file.getTitle() + "] ...");
                 Path fileToCheck = Paths.get(folder.toString(), file.getTitle().concat(".").concat(file.getFileExtension()));
                 if (isNewOrMoreRecentInGoogleDrive(file, fileToCheck.toFile())) {
                     googleDriveHelper.downloadFile(drive, file, folder);
-                    LOGGER.fine("Fichier téléchargé : [" + fileToCheck.toString() + " ]");
+                    LOGGER.fine("Downloaded file : [" + fileToCheck.toString() + " ]");
                 }
             }
         } catch (InvalidPathException e1) {
