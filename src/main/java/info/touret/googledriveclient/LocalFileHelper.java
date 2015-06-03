@@ -38,7 +38,6 @@ public class LocalFileHelper {
             if (!Files.exists(folder)) {
                 Files.createDirectory(folder);
             }
-
         } catch (IOException e) {
             LOGGER.log(SEVERE, e.getMessage(), e);
             throw new GoogleDriveException(e);

@@ -53,13 +53,19 @@ public class GoogleDriveClient {
             /* On gere les fichiers contenus dans le repertoire */
             List<File> files = googleDriveHelper.listRealFilesOfAFolder(drive, gdriveFolder);
             for (File file : files) {
-                LOGGER.fine("------>" + file.getTitle());
+
                 LOGGER.fine("Checking [" + file.getTitle() + "] in [" + localFolder.toString() + "] with extension [" + file.getFileExtension() + "]");
-                Path fileToCheck = Paths.get(localFolder.toString(), file.getTitle().concat(".").concat(file.getFileExtension()));
+                Path fileToCheck = Paths.get(localFolder.toString(), file.getTitle());
                 if (isNewOrMoreRecentInGoogleDrive(file, fileToCheck.toFile())) {
                     googleDriveHelper.downloadFile(drive, file, localFolder);
                     LOGGER.fine("Downloaded file : [" + fileToCheck.toString() + " ]");
+                } else {
+                    // Suppression fichiers locaux
+
+                    //
+
                 }
+
             }
         } catch (InvalidPathException e1) {
             LOGGER.log(Level.WARNING, e1.getMessage());
