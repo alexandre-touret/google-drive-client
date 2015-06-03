@@ -34,8 +34,11 @@ public class LocalFileHelper {
     public Path createOrGetFolder(Path rootFolder, String newFolder) {
         Path folder = null;
         try {
-            final Path dir = Paths.get(rootFolder.toString(), newFolder);
-            Files.createDirectory(dir);
+            folder = Paths.get(rootFolder.toString(), newFolder);
+            if (!Files.exists(folder)) {
+                Files.createDirectory(folder);
+            }
+
         } catch (IOException e) {
             LOGGER.log(SEVERE, e.getMessage(), e);
             throw new GoogleDriveException(e);

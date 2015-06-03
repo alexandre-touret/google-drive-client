@@ -49,12 +49,12 @@ public class GoogleDriveClient {
      * @param localFileHelper
      */
     private void synchronizeGoogleDriveFolder(Drive drive, Path localFolder, String gdriveFolder, GoogleDriveHelper googleDriveHelper, LocalFileHelper localFileHelper) {
-
         try {
             /* On gere les fichiers contenus dans le repertoire */
             List<File> files = googleDriveHelper.listRealFilesOfAFolder(drive, gdriveFolder);
             for (File file : files) {
-                LOGGER.fine("Checking [" + file.getTitle() + "] ...");
+                LOGGER.fine("------>" + file.getTitle());
+                LOGGER.fine("Checking [" + file.getTitle() + "] in [" + localFolder.toString() + "] with extension [" + file.getFileExtension() + "]");
                 Path fileToCheck = Paths.get(localFolder.toString(), file.getTitle().concat(".").concat(file.getFileExtension()));
                 if (isNewOrMoreRecentInGoogleDrive(file, fileToCheck.toFile())) {
                     googleDriveHelper.downloadFile(drive, file, localFolder);

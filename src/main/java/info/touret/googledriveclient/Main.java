@@ -103,10 +103,13 @@ public class Main {
     private static void checkAndConfigureProxy(CommandLine commandLine) {
         if (commandLine.hasOption("p")) {
             // proxy
-            LOGGER.fine("Proxy Configuration ...");
-            ProxyHelper proxyHelper = new ProxyHelper(true, true, commandLine.getOptionValue("proxy_port"),
-                    commandLine.getOptionValue("proxy_host"),
-                    commandLine.getOptionValue("proxy_user"),
+            final String proxyHost = commandLine.getOptionValue("proxy_host");
+            final String proxyUser = commandLine.getOptionValue("proxy_user");
+            final String proxyPort = commandLine.getOptionValue("proxy_port");
+            LOGGER.fine("Proxy Configuration  [" + proxyUser + ":*****@" + proxyHost + ":" + proxyPort + "]");
+            ProxyHelper proxyHelper = new ProxyHelper(true, true, proxyPort,
+                    proxyHost,
+                    proxyUser,
                     commandLine.getOptionValue("proxy_password"));
             proxyHelper.setUpProxy();
         }
