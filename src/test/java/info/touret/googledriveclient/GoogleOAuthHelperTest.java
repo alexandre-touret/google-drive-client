@@ -121,4 +121,22 @@ public class GoogleOAuthHelperTest {
         // running test
         googleOAuthHelper.storeCredentialInConfigFile("token");
     }
+
+    @Test
+    public void teststoreCredentialInConfigFile_KO() throws Exception {
+        // mock initialization
+        when(Paths.get(first, GoogleOAuthHelper.GDRIVE_CONF)).thenReturn(mockConfFile);
+        when(Files.createFile(mockConfFile)).thenThrow(new FileNotFoundException(""));
+        final FileWriter fileWriter = mock(FileWriter.class);
+        whenNew(FileWriter.class).withAnyArguments().thenReturn(fileWriter);
+        doThrow(new FileNotFoundException("File Doesnt exist")).when(properties).store(fileWriter, null);
+        doNothing().when(properties).store(fileWriter, null);
+        // running test
+        try {
+            googleOAuthHelper.storeCredentialInConfigFile("token");
+            fail();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
