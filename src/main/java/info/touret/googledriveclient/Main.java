@@ -20,7 +20,10 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Optional;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -131,7 +134,11 @@ public class Main {
         if (!Files.exists(gdriveFolder)) {
             LOGGER.warning("This folder [" + commandLine.getOptionValue(FOLDER_DIRECTORY) + "] doesn't exist or the folder [" + gdriveFolder + "]is already exists");
             LOGGER.warning("Creating folder [" + gdriveFolder + "]");
+            Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rwxr-x---");
+
             Files.createDirectory(gdriveFolder);
+            gdriveFolder.toFile().setWritable(true);
+
         }
     }
 

@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class GoogleDriveClientTest {
     private GoogleDriveClient googleDriveClient;
     private Drive drive;
     private Path dir;
+    private GoogleDriveHelper googleDriveHelper;
 
 
     @Before
@@ -60,14 +62,21 @@ public class GoogleDriveClientTest {
         final Path path = mock(Path.class);
         when(path.toFile()).thenReturn(mock(java.io.File.class));
         when(Paths.get(anyString(), anyString())).thenReturn(path);
-        final GoogleDriveHelper googleDriveHelper = mock(GoogleDriveHelper.class);
+        googleDriveHelper = mock(GoogleDriveHelper.class);
         whenNew(GoogleDriveHelper.class).withNoArguments().thenReturn(googleDriveHelper);
         doNothing().when(googleDriveHelper).downloadFile(drive, file, path);
+
 
     }
 
     @Test
     public void testSynchronize_OK() throws Exception {
+        googleDriveClient.synchronize(drive, dir);
+    }
+
+    @Test
+    public void testSynchronize_Incorrect_Google_Drive_Client() throws Exception {
+        when(googleDriveHelper.listFolders(drive, dir.toString())).thenThrow(new IOException());
         googleDriveClient.synchronize(drive, dir);
     }
 

@@ -96,6 +96,7 @@ public class GoogleOAuthHelper {
         String url = flow.newAuthorizationUrl().setRedirectUri(redirectUri).build();
         System.out.println("Please open the following URL in your browser then type the authorization code:");
         System.out.println("  " + url);
+        System.out.println("\n\n");
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         String code = br.readLine();
         GoogleTokenResponse response = flow.newTokenRequest(code).setRedirectUri(redirectUri).execute();

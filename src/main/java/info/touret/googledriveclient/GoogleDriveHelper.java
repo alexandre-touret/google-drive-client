@@ -74,7 +74,7 @@ public class GoogleDriveHelper {
      */
     public void downloadFile(Drive drive, File gdriveFile, Path folder) {
 
-        Path newFile = Paths.get(folder.toString(), gdriveFile.getTitle().concat(".").concat(gdriveFile.getFileExtension()));
+        Path newFile = Paths.get(folder.toString(), gdriveFile.getTitle());
         try {
             newFile = Files.createFile(newFile);
         } catch (IOException e) {
