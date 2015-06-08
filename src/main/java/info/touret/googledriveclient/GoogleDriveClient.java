@@ -63,7 +63,6 @@ public class GoogleDriveClient {
                     // Suppression fichiers locaux
 
                     //
-
                 }
 
             }
