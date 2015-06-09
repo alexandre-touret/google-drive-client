@@ -93,6 +93,6 @@ public class GoogleOAuthHelper {
 
 
     public enum SECRETS {
-        CLIENT_ID, CLIENT_SECRET, REDIRECT_URL;
+        CLIENT_ID, CLIENT_SECRET, REDIRECT_URL
     }
 }

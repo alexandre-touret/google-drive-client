@@ -33,6 +33,15 @@ public class Configuration {
         properties.setProperty(key, value);
     }
 
+
+    /**
+     * @param aLong
+     * @return
+     */
+    public Boolean isLastSyncMoreRecentThan(Long aLong) {
+        return getValue(TIMESTAMP).isPresent() && Long.parseLong(getValue(TIMESTAMP).get()) > aLong;
+    }
+
     public Optional<String> getValue(String key) {
         return Optional.ofNullable(properties.getProperty(key));
     }

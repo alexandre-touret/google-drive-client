@@ -51,18 +51,18 @@ public class GoogleDriveHelper {
     }
 
     /**
-     * Liste les fichiers qui ne sont pas des documents google
+     * Liste les fichiers qui ne sont pas des documents google. Attention un filtre est réalisé par rapport a la derniere date de consultation
      * @param drive
      * @param root
      * @return La liste des documents
      * @throws IOException
      */
-    public List<File> listRealFilesOfAFolder(Drive drive, String root) throws IOException {
+    public List<File> listRealFilesOfAFolder(Drive drive, String root, Configuration configuration) throws IOException {
         List<File> files = new ArrayList<>();
         ChildList childList = drive.children().list(root).execute();
         for (ChildReference children : childList.getItems()) {
             final File file = drive.files().get(children.getId()).execute();
-            if (!file.getMimeType().startsWith(APPLICATION_VND_GOOGLE_APPS)) {
+            if (!file.getMimeType().startsWith(APPLICATION_VND_GOOGLE_APPS) && !configuration.isLastSyncMoreRecentThan(file.getModifiedDate().getValue())) {
                 files.add(file);
             }
         }

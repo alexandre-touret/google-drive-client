@@ -28,7 +28,7 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-;
+
 
 /**
  * Application principale
@@ -110,7 +110,8 @@ public class Main {
             final String proxyUser = commandLine.getOptionValue("proxy_user");
             final String proxyPort = commandLine.getOptionValue("proxy_port");
             LOGGER.fine("Proxy Configuration  [" + proxyUser + ":*****@" + proxyHost + ":" + proxyPort + "]");
-            ProxyHelper proxyHelper = new ProxyHelper(true, true, proxyPort,
+            Boolean useHTPPAuth = proxyUser != null || !proxyUser.isEmpty();
+            ProxyHelper proxyHelper = new ProxyHelper(true, useHTPPAuth, proxyPort,
                     proxyHost,
                     proxyUser,
                     commandLine.getOptionValue("proxy_password"));

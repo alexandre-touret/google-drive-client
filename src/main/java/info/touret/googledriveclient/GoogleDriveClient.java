@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,6 +30,9 @@ public class GoogleDriveClient {
     public void synchronize(Drive drive, Path folder) {
         Configuration configuration = new Configuration.Builder().withDirectory(folder).build();
         synchronizeGoogleDriveFolder(drive, folder, ROOT_FOLDER, new GoogleDriveHelper(), new LocalFileHelper(), configuration);
+        /* Store timestamp TODO: handle timezone offset */
+        configuration.putValue(Configuration.TIMESTAMP, String.valueOf(Instant.now().getEpochSecond()));
+        configuration.store();
     }
 
     /**
@@ -62,7 +66,7 @@ public class GoogleDriveClient {
     private void synchronizeGoogleDriveFolder(Drive drive, Path localFolder, String gdriveFolder, GoogleDriveHelper googleDriveHelper, LocalFileHelper localFileHelper, Configuration configuration) {
         try {
         /* On gere les fichiers contenus dans le repertoire */
-            List<File> files = googleDriveHelper.listRealFilesOfAFolder(drive, gdriveFolder);
+            List<File> files = googleDriveHelper.listRealFilesOfAFolder(drive, gdriveFolder, configuration);
             for (File file : files) {
                 LOGGER.fine("Checking [" + file.getTitle() + "] in [" + localFolder.toString() + "] with extension [" + file.getFileExtension() + "]");
                 Path fileToCheck = Paths.get(localFolder.toString(), file.getTitle());
