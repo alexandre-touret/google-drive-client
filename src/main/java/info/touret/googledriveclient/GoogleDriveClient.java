@@ -19,6 +19,7 @@ public class GoogleDriveClient {
     public static final String ROOT_FOLDER = "root";
     private final static Logger LOGGER = Logger.getLogger(GoogleDriveClient.class.getName());
 
+
     /**
      * Synchronise un repertoire de maniere recursive
      *
@@ -26,7 +27,8 @@ public class GoogleDriveClient {
      * @param folder
      */
     public void synchronize(Drive drive, Path folder) {
-        synchronizeGoogleDriveFolder(drive, folder, ROOT_FOLDER, new GoogleDriveHelper(), new LocalFileHelper());
+        Configuration configuration = new Configuration.Builder().withDirectory(folder).build();
+        synchronizeGoogleDriveFolder(drive, folder, ROOT_FOLDER, new GoogleDriveHelper(), new LocalFileHelper(), configuration);
     }
 
     /**
@@ -40,6 +42,15 @@ public class GoogleDriveClient {
         return !localFile.exists() || localFile.lastModified() < gdriveFile.getModifiedDate().getValue();
     }
 
+    private Boolean isNewLocally(java.io.File localFile, Configuration configuration) {
+        Boolean isNewOrMoreRecent = false;
+        if (configuration.getValue(Configuration.TIMESTAMP).isPresent()) {
+            isNewOrMoreRecent = localFile.lastModified() > Long.parseLong(configuration.getValue(Configuration.TIMESTAMP).get());
+        }
+        return isNewOrMoreRecent;
+
+    }
+
 
     /**
      * @param drive
@@ -48,12 +59,11 @@ public class GoogleDriveClient {
      * @param googleDriveHelper
      * @param localFileHelper
      */
-    private void synchronizeGoogleDriveFolder(Drive drive, Path localFolder, String gdriveFolder, GoogleDriveHelper googleDriveHelper, LocalFileHelper localFileHelper) {
+    private void synchronizeGoogleDriveFolder(Drive drive, Path localFolder, String gdriveFolder, GoogleDriveHelper googleDriveHelper, LocalFileHelper localFileHelper, Configuration configuration) {
         try {
-            /* On gere les fichiers contenus dans le repertoire */
+        /* On gere les fichiers contenus dans le repertoire */
             List<File> files = googleDriveHelper.listRealFilesOfAFolder(drive, gdriveFolder);
             for (File file : files) {
-
                 LOGGER.fine("Checking [" + file.getTitle() + "] in [" + localFolder.toString() + "] with extension [" + file.getFileExtension() + "]");
                 Path fileToCheck = Paths.get(localFolder.toString(), file.getTitle());
                 if (isNewOrMoreRecentInGoogleDrive(file, fileToCheck.toFile())) {
@@ -63,7 +73,10 @@ public class GoogleDriveClient {
                     // Suppression fichiers locaux
 
 
-                    //
+                    // nouveau fichier local
+                    if (isNewLocally(fileToCheck.toFile(), configuration)) {
+                        googleDriveHelper.uploadFile(drive, fileToCheck.toFile(), gdriveFolder);
+                    }
                 }
 
             }
@@ -81,7 +94,7 @@ public class GoogleDriveClient {
             for (File currentFolder : folders) {
                 LOGGER.info(currentFolder.getId());
                 Path newFolder = localFileHelper.createOrGetFolder(localFolder, currentFolder.getTitle());
-                synchronizeGoogleDriveFolder(drive, newFolder, currentFolder.getId(), googleDriveHelper, localFileHelper);
+                synchronizeGoogleDriveFolder(drive, newFolder, currentFolder.getId(), googleDriveHelper, localFileHelper, configuration);
             }
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);

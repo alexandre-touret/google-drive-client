@@ -7,13 +7,16 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.ChildList;
 import com.google.api.services.drive.model.ChildReference;
 import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.ParentReference;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -89,7 +92,33 @@ public class GoogleDriveHelper {
         }
     }
 
+    /**
+     * @param httpTransport
+     * @param jsonFactory
+     * @param credential
+     * @return
+     */
     public Drive buildDrive(HttpTransport httpTransport, JsonFactory jsonFactory, GoogleCredential credential) {
         return new Drive.Builder(httpTransport, jsonFactory, credential).setApplicationName("googledriveclient").build();
+    }
+
+
+    /**
+     * @param drive
+     * @param fileToCheck
+     * @param gdriveFolder
+     */
+    public void uploadFile(Drive drive, java.io.File fileToCheck, String gdriveFolder) {
+        File file = new File();
+        file.setTitle(fileToCheck.getName());
+        file.setDescription(fileToCheck.getName());
+        file.setMimeType(URLConnection.guessContentTypeFromName(fileToCheck.getAbsolutePath()));
+        file.setParents(Arrays.asList(new ParentReference().setId(gdriveFolder)));
+        try {
+            drive.files().insert(file).execute();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            throw new GoogleDriveException(e);
+        }
     }
 }

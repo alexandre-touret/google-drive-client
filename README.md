@@ -31,5 +31,5 @@ First you have to create a profile in your settings.xml file
 ```
 then run
 ```
-$ mvn clean install -P google-drive-client
+$ mvn clean install assembly:assembly -P google-drive-client
 ```
