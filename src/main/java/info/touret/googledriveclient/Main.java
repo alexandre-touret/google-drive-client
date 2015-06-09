@@ -11,6 +11,8 @@ import info.touret.googledriveclient.proxy.ProxyHelper;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
@@ -29,7 +31,6 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 
-
 /**
  * Application principale
  */
@@ -44,16 +45,13 @@ public class Main {
      */
     private static Options createOptions() {
         Options options = new Options();
-        options.addOption("a", false, "authorization");
-        options.addOption("f", true, "folder");
-        options.addOption("p", false, "proxy");
-
+        options.addOption(OptionBuilder.hasArg(false).withLongOpt("authorize").isRequired().withDescription("Google Authorization").create('a'));
+        options.addOption(OptionBuilder.hasArg(true).withArgName("localFolder").withLongOpt("local-folder").withDescription("Google Drive Local Folder").create('f'));
+        options.addOption(new Option("help", "print this message"));
         options.addOption(OptionBuilder.withArgName("host").hasArg(true).withDescription("Proxy Host").create("proxy_host"));
         options.addOption(OptionBuilder.withArgName("port").hasArg(true).withDescription("Proxy Port").create("proxy_port"));
         options.addOption(OptionBuilder.withArgName("user").hasArg(true).withDescription("Proxy User").create("proxy_user"));
         options.addOption(OptionBuilder.withArgName("password").hasArg(true).withDescription("Proxy password").create("proxy_password"));
-//        options.addOption(OptionBuilder.withwithArgName("a").hasArg().withDescription("authorization").create("authorization"));
-//        options.addOption(OptionBuilder.withLongOpt()withArgName("FOLDER").hasArg().isRequired().withDescription("Google Drive Local Folder").create("folder"));
         return options;
     }
 
@@ -61,14 +59,12 @@ public class Main {
     public static void main(String[] args) {
         init();
         Options options = createOptions();
-
         CommandLineParser commandLineParser = new BasicParser();
-
         GoogleDriveHelper googleDriveHelper = new GoogleDriveHelper();
         try {
             final CommandLine commandLine = commandLineParser.parse(options, args);
-
             Path gdriveFolder = Paths.get(commandLine.getOptionValue(FOLDER_DIRECTORY), GOOGLE_DRIVE_FOLDER);
+
             checkGoogleDriveFolder(commandLine, gdriveFolder);
             checkAndConfigureProxy(commandLine);
 
@@ -93,14 +89,21 @@ public class Main {
             GoogleDriveClient googleDriveClient = new GoogleDriveClient();
             googleDriveClient.synchronize(service, gdriveFolder);
 
-        } catch (IOException | ParseException e) {
+        } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new GoogleDriveException(e);
+        } catch (ParseException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage());
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("ant", options);
+            System.exit(-2);
         }
+
     }
 
     /**
      * Verifie et configure si besoin le proxy
+     *
      * @param commandLine
      */
     private static void checkAndConfigureProxy(CommandLine commandLine) {
