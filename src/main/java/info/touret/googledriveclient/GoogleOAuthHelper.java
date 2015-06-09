@@ -8,40 +8,39 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.services.drive.DriveScopes;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static info.touret.googledriveclient.Configuration.ACCESS_TOKEN;
+
 /**
  * Created by touret-a on 20/05/2015.
  */
 public class GoogleOAuthHelper {
-    public static final String GDRIVE_CONF = ".gdrive.conf";
-    public static final String ACCESS_TOKEN = "access_token";
+
     private final static Logger LOGGER = Logger.getLogger(GoogleOAuthHelper.class.getName());
     private Properties secrets;
     private Path directory;
+    private Configuration configuration;
 
     public GoogleOAuthHelper(Path directory) {
         this.directory = directory;
+        configuration = new Configuration.Builder().withDirectory(directory).build();
     }
 
     private Properties getSecrets() {
         if (secrets == null) {
-            secrets= new Properties();
+            secrets = new Properties();
             try {
                 secrets.load(this.getClass().getResourceAsStream("/secrets.properties"));
             } catch (IOException e) {
-                LOGGER.log(Level.SEVERE,e.getMessage(),e);
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
                 throw new GoogleDriveException(e);
             }
         }
@@ -60,28 +59,10 @@ public class GoogleOAuthHelper {
         this.directory = directory;
     }
 
-    private void createConfFile() {
-        try {
-            Path confFile = Paths.get(getDirectory().toString(), GDRIVE_CONF);
-            Files.deleteIfExists(confFile);
-            Files.createFile(confFile);
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Unable to remove the config file ", e);
-            throw new GoogleDriveException(e);
-        }
-    }
 
     public void storeCredentialInConfigFile(String accessToken) {
-        try {
-            createConfFile();
-            Path confFile = Paths.get(getDirectory().toString(), GDRIVE_CONF);
-            Properties properties = new Properties();
-            properties.put(ACCESS_TOKEN, accessToken);
-            properties.store(new FileWriter(confFile.toFile()), null);
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Unable to store credentials in config file ", e);
-            throw new GoogleDriveException(e);
-        }
+        configuration.putValue(ACCESS_TOKEN, accessToken);
+        configuration.store();
     }
 
     public GoogleCredential getGoogleCredential(HttpTransport httpTransport, JsonFactory jsonFactory) throws IOException {
@@ -107,15 +88,7 @@ public class GoogleOAuthHelper {
     }
 
     public Optional<String> getAccessToken() {
-        try {
-            Properties properties = new Properties();
-            Path confFile = Paths.get(getDirectory().toString(), GDRIVE_CONF);
-            properties.load(new FileReader(confFile.toFile()));
-            return Optional.ofNullable(properties.getProperty(ACCESS_TOKEN));
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Unable to load credentials from config file ", e);
-            throw new GoogleDriveException(e);
-        }
+        return configuration.getValue(ACCESS_TOKEN);
     }
 
 

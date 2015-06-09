@@ -62,7 +62,7 @@ public class GoogleOAuthHelperTest {
 
         properties = mock(Properties.class);
         whenNew(Properties.class).withNoArguments().thenReturn(properties);
-        when(properties.getProperty(GoogleOAuthHelper.ACCESS_TOKEN)).thenReturn("token");
+        when(properties.getProperty(Configuration.ACCESS_TOKEN)).thenReturn("token");
         mockConfFile = mock(Path.class);
     }
 
@@ -84,7 +84,7 @@ public class GoogleOAuthHelperTest {
         //File mockFile = mock(File.class);
         whenNew(FileReader.class).withAnyArguments().thenReturn(mock(FileReader.class));
         doNothing().when(properties).load(Matchers.any(InputStream.class));
-        when(Paths.get(first, GoogleOAuthHelper.GDRIVE_CONF)).thenReturn(mockConfFile);
+        when(Paths.get(first, Configuration.GDRIVE_CONF)).thenReturn(mockConfFile);
 //        when(mockConfFile.toFile()).thenReturn(mockFile);
         final Optional<String> accessToken = googleOAuthHelper.getAccessToken();
         assertNotNull(accessToken);
@@ -101,7 +101,7 @@ public class GoogleOAuthHelperTest {
 
         whenNew(FileReader.class).withArguments(mockFile).thenThrow(new FileNotFoundException("File Doesnt exist"));
         doNothing().when(properties).load(Matchers.any(InputStream.class));
-        when(Paths.get(first, GoogleOAuthHelper.GDRIVE_CONF)).thenReturn(mockConfFile);
+        when(Paths.get(first, Configuration.GDRIVE_CONF)).thenReturn(mockConfFile);
 
         try {
             final Optional<String> accessToken = googleOAuthHelper.getAccessToken();
@@ -113,7 +113,7 @@ public class GoogleOAuthHelperTest {
     @Test
     public void teststoreCredentialInConfigFile_OK() throws Exception {
         // mock initialization
-        when(Paths.get(first, GoogleOAuthHelper.GDRIVE_CONF)).thenReturn(mockConfFile);
+        when(Paths.get(first, Configuration.GDRIVE_CONF)).thenReturn(mockConfFile);
         when(Files.createFile(mockConfFile)).thenReturn(null);
         final FileWriter fileWriter = mock(FileWriter.class);
         whenNew(FileWriter.class).withAnyArguments().thenReturn(fileWriter);
@@ -125,7 +125,7 @@ public class GoogleOAuthHelperTest {
     @Test
     public void teststoreCredentialInConfigFile_KO() throws Exception {
         // mock initialization
-        when(Paths.get(first, GoogleOAuthHelper.GDRIVE_CONF)).thenReturn(mockConfFile);
+        when(Paths.get(first, Configuration.GDRIVE_CONF)).thenReturn(mockConfFile);
         when(Files.createFile(mockConfFile)).thenThrow(new FileNotFoundException(""));
         final FileWriter fileWriter = mock(FileWriter.class);
         whenNew(FileWriter.class).withAnyArguments().thenReturn(fileWriter);
