@@ -93,8 +93,10 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
+                    <finalName>google-drive-client</finalName>
                     <archive>
-                        <manifest>
+
+                    <manifest>
                             <mainClass>info.touret.googledriveclient.Main</mainClass>
                         </manifest>
                     </archive>

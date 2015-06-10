@@ -16,7 +16,7 @@ Except the use of GOOGLE DRIVE JAVA API which is licensed under Apache License, 
 This program uses google java api. You have [to enable the drive API and follow instructions from this page] (https://developers.google.com/drive/web/quickstart/java#step_1_enable_the_drive_api)
 
 ### Build
-This program uses maven 3.2.x
+This program uses both JDK8 and maven 3.2.x
 
 First you have to create a profile in your settings.xml file
 ```
@@ -32,4 +32,27 @@ First you have to create a profile in your settings.xml file
 then run
 ```
 $ mvn clean install assembly:assembly -P google-drive-client
+```
+
+
+# Run
+```
+$ java -jar google-drive-client-jar-with-dependencies.jar  <OPTIONS>
+```
+
+## Options
+```
+ -a,--authorize                    Google Authorization
+ -f,--local-folder <localFolder>   Google Drive Local Folder
+ -help                             Print this message
+ -proxy_host <host>                Proxy Host
+ -proxy_password <password>        Proxy password
+ -proxy_port <port>                Proxy Port
+ -proxy_user <user>                Proxy User
+```
+
+## Example
+
+```
+$ java -jar google-drive-client-jar-with-dependencies.jar  -a -f /home/myuser/
 ```

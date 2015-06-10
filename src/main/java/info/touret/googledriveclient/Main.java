@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 
 
 /**
- * Application principale
+ * Main Application
  */
 public class Main {
     public static final String GOOGLE_DRIVE_FOLDER = "GoogleDrive";
@@ -41,20 +41,20 @@ public class Main {
     private final static Logger LOGGER = Logger.getLogger(Main.class.getName());
 
     /**
-     * @return les options
+     * Creates options
+     * @return Command line options
      */
     private static Options createOptions() {
         Options options = new Options();
-        options.addOption(OptionBuilder.hasArg(false).withLongOpt("authorize").isRequired().withDescription("Google Authorization").create('a'));
-        options.addOption(OptionBuilder.hasArg(true).withArgName("localFolder").withLongOpt("local-folder").withDescription("Google Drive Local Folder").create('f'));
-        options.addOption(new Option("help", "print this message"));
+        options.addOption(OptionBuilder.hasArg(false).withLongOpt("authorize").withDescription("Google Authorization").create('a'));
+        options.addOption(OptionBuilder.hasArg(true).withArgName("localFolder").isRequired().withLongOpt("local-folder").withDescription("Google Drive Local Folder").create('f'));
+        options.addOption(new Option("help", "Print this message"));
         options.addOption(OptionBuilder.withArgName("host").hasArg(true).withDescription("Proxy Host").create("proxy_host"));
         options.addOption(OptionBuilder.withArgName("port").hasArg(true).withDescription("Proxy Port").create("proxy_port"));
         options.addOption(OptionBuilder.withArgName("user").hasArg(true).withDescription("Proxy User").create("proxy_user"));
         options.addOption(OptionBuilder.withArgName("password").hasArg(true).withDescription("Proxy password").create("proxy_password"));
         return options;
     }
-
 
     public static void main(String[] args) {
         init();
@@ -102,7 +102,7 @@ public class Main {
     }
 
     /**
-     * Verifie et configure si besoin le proxy
+     * Checks and configure proxy from arguments passed in the command line
      *
      * @param commandLine
      */
@@ -146,11 +146,14 @@ public class Main {
         }
     }
 
+    /**
+     * Initialize LogManager
+     */
     private static void init() {
         try (InputStream input = Main.class.getResourceAsStream("/logging.properties")) {
             LogManager.getLogManager().readConfiguration(input);
         } catch (IOException e) {
-            // Ne devrait pas arriver
+            // Ne devrait pas arriver !!
             e.printStackTrace();
         }
     }
