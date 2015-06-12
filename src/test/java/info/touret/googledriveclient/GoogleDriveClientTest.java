@@ -76,7 +76,7 @@ public class GoogleDriveClientTest {
 
     @Test
     public void testSynchronize_Incorrect_Google_Drive_Client() throws Exception {
-        when(googleDriveHelper.listFolders(drive, dir.toString())).thenThrow(new IOException());
+        when(googleDriveHelper.listFolders(drive, dir.toString(), null)).thenThrow(new IOException());
         googleDriveClient.synchronize(drive, dir);
     }
 

@@ -38,20 +38,23 @@ public class GoogleDriveHelper {
      * @return
      * @throws IOException
      */
-    public List<File> listFolders(Drive drive, String root) throws IOException {
+    public List<File> listFolders(Drive drive, String root, Configuration configuration) throws IOException {
         List<File> files = new ArrayList<>();
         ChildList childList = drive.children().list(root).setQ("mimeType = 'application/vnd.google-apps.folder' ").execute();
 
         for (ChildReference children : childList.getItems()) {
             final File file = drive.files().get(children.getId()).execute();
-            files.add(file);
-            LOGGER.fine("Folder founded : " + file.getTitle());
+            if (!configuration.isLastSyncMoreRecentThan(file.getModifiedDate().getValue())) {
+                files.add(file);
+                LOGGER.fine("Folder founded : " + file.getTitle());
+            }
         }
         return files;
     }
 
     /**
      * Liste les fichiers qui ne sont pas des documents google. Attention un filtre est réalisé par rapport a la derniere date de consultation
+     *
      * @param drive
      * @param root
      * @return La liste des documents
@@ -71,12 +74,12 @@ public class GoogleDriveHelper {
 
     /**
      * Telecharge un fichier donne
+     *
      * @param drive
      * @param gdriveFile
      * @param folder
      */
     public void downloadFile(Drive drive, File gdriveFile, Path folder) {
-
         Path newFile = Paths.get(folder.toString(), gdriveFile.getTitle());
         try {
             newFile = Files.createFile(newFile);
@@ -121,4 +124,5 @@ public class GoogleDriveHelper {
             throw new GoogleDriveException(e);
         }
     }
+
 }

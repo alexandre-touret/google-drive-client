@@ -46,6 +46,9 @@ public class Configuration {
         return Optional.ofNullable(properties.getProperty(key));
     }
 
+    /**
+     *
+     */
     public void store() {
         try {
             this.properties.store(new FileWriter(Paths.get(directory.toString(), Configuration.GDRIVE_CONF).toFile()), null);
@@ -55,6 +58,9 @@ public class Configuration {
         }
     }
 
+    /**
+     * Class builder
+     */
     public static class Builder {
         private Path directory;
 

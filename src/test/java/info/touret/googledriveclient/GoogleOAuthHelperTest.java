@@ -31,7 +31,7 @@ import static org.powermock.api.mockito.PowerMockito.*;
  * Created by touret-a on 03/06/2015.
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({GoogleOAuthHelper.class})
+@PrepareForTest({GoogleOAuthHelper.class, Configuration.Builder.class})
 public class GoogleOAuthHelperTest {
 
     private GoogleOAuthHelper googleOAuthHelper;
@@ -55,13 +55,16 @@ public class GoogleOAuthHelperTest {
         httpTransport = mock(HttpTransport.class);
         jsonFactory = mock(JsonFactory.class);
         mockStatic(Files.class, Paths.class);
-
+        Configuration.Builder configurationBuilder = mock(Configuration.Builder.class);
+        Configuration mockConfiguration = mock(Configuration.class);
+        when(configurationBuilder.withDirectory(mockDir)).thenReturn(configurationBuilder);
+        when(configurationBuilder.build()).thenReturn(mockConfiguration);
+        whenNew(Configuration.Builder.class).withAnyArguments().thenReturn(configurationBuilder);
         googleOAuthHelper = new GoogleOAuthHelper(mockDir);
-
         first = mockDir.toString();
-
         properties = mock(Properties.class);
         whenNew(Properties.class).withNoArguments().thenReturn(properties);
+
         when(properties.getProperty(Configuration.ACCESS_TOKEN)).thenReturn("token");
         mockConfFile = mock(Path.class);
     }

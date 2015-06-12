@@ -74,15 +74,11 @@ public class GoogleDriveClient {
                     googleDriveHelper.downloadFile(drive, file, localFolder);
                     LOGGER.fine("Downloaded file : [" + fileToCheck.toString() + " ]");
                 } else {
-                    // Suppression fichiers locaux
-
-
                     // nouveau fichier local
                     if (isNewLocally(fileToCheck.toFile(), configuration)) {
                         googleDriveHelper.uploadFile(drive, fileToCheck.toFile(), gdriveFolder);
                     }
                 }
-
             }
         } catch (InvalidPathException e1) {
             LOGGER.log(Level.WARNING, e1.getMessage());
@@ -94,7 +90,7 @@ public class GoogleDriveClient {
 
         try {
           /* On gere les repertoires */
-            List<File> folders = googleDriveHelper.listFolders(drive, gdriveFolder);
+            List<File> folders = googleDriveHelper.listFolders(drive, gdriveFolder, configuration);
             for (File currentFolder : folders) {
                 LOGGER.info(currentFolder.getId());
                 Path newFolder = localFileHelper.createOrGetFolder(localFolder, currentFolder.getTitle());

@@ -47,6 +47,7 @@ public class Main {
     private static Options createOptions() {
         Options options = new Options();
         options.addOption(OptionBuilder.hasArg(false).withLongOpt("authorize").withDescription("Google Authorization").create('a'));
+        options.addOption(OptionBuilder.hasArg(false).withLongOpt("use-proxy").withDescription("Use Proxy").create('p'));
         options.addOption(OptionBuilder.hasArg(true).withArgName("localFolder").isRequired().withLongOpt("local-folder").withDescription("Google Drive Local Folder").create('f'));
         options.addOption(new Option("help", "Print this message"));
         options.addOption(OptionBuilder.withArgName("host").hasArg(true).withDescription("Proxy Host").create("proxy_host"));
