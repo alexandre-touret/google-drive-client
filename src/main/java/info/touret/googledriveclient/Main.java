@@ -140,10 +140,8 @@ public class Main {
             LOGGER.warning("This folder [" + commandLine.getOptionValue(FOLDER_DIRECTORY) + "] doesn't exist or the folder [" + gdriveFolder + "]is already exists");
             LOGGER.warning("Creating folder [" + gdriveFolder + "]");
             Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rwxr-x---");
-
             Files.createDirectory(gdriveFolder);
             gdriveFolder.toFile().setWritable(true);
-
         }
     }
 
