@@ -49,7 +49,7 @@ public class GoogleDriveClient {
     private Boolean isNewLocally(java.io.File localFile, Configuration configuration) {
         Boolean isNewOrMoreRecent = false;
         if (configuration.getValue(Configuration.TIMESTAMP).isPresent()) {
-            isNewOrMoreRecent = localFile.lastModified() > Long.parseLong(configuration.getValue(Configuration.TIMESTAMP).get());
+            isNewOrMoreRecent = localFile.lastModified() >= Long.parseLong(configuration.getValue(Configuration.TIMESTAMP).get());
         }
         return isNewOrMoreRecent;
 
@@ -71,6 +71,10 @@ public class GoogleDriveClient {
                 LOGGER.fine("Checking [" + file.getTitle() + "] in [" + localFolder.toString() + "] with extension [" + file.getFileExtension() + "]");
                 Path fileToCheck = Paths.get(localFolder.toString(), file.getTitle());
                 if (isNewOrMoreRecentInGoogleDrive(file, fileToCheck.toFile())) {
+                    try {
+                        Thread.sleep(1000L);
+                    } catch (InterruptedException e) {
+                    }
                     googleDriveHelper.downloadFile(drive, file, localFolder);
                     LOGGER.fine("Downloaded file : [" + fileToCheck.toString() + " ]");
                 } else {

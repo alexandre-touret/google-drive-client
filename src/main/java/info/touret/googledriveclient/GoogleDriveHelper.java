@@ -25,7 +25,6 @@ import java.util.logging.Logger;
  * Created by touret-a on 22/05/2015.
  */
 public class GoogleDriveHelper {
-
     public static final String APPLICATION_VND_GOOGLE_APPS_FOLDER = "application/vnd.google-apps.folder";
     public static final String APPLICATION_VND_GOOGLE_APPS = "application/vnd.google-apps";
     private final static Logger LOGGER = Logger.getLogger(GoogleDriveHelper.class.getName());
@@ -46,7 +45,7 @@ public class GoogleDriveHelper {
             final File file = drive.files().get(children.getId()).execute();
             if (!configuration.isLastSyncMoreRecentThan(file.getModifiedDate().getValue())) {
                 files.add(file);
-                LOGGER.fine("Folder founded : " + file.getTitle());
+                LOGGER.fine("Folder found : " + file.getTitle());
             }
         }
         return files;
@@ -65,7 +64,8 @@ public class GoogleDriveHelper {
         ChildList childList = drive.children().list(root).execute();
         for (ChildReference children : childList.getItems()) {
             final File file = drive.files().get(children.getId()).execute();
-            if (!file.getMimeType().startsWith(APPLICATION_VND_GOOGLE_APPS) && !configuration.isLastSyncMoreRecentThan(file.getModifiedDate().getValue())) {
+            if (!file.getMimeType().startsWith(APPLICATION_VND_GOOGLE_APPS)
+                    && !configuration.isLastSyncMoreRecentThan(file.getModifiedDate().getValue())) {
                 files.add(file);
             }
         }
@@ -82,6 +82,7 @@ public class GoogleDriveHelper {
     public void downloadFile(Drive drive, File gdriveFile, Path folder) {
         Path newFile = Paths.get(folder.toString(), gdriveFile.getTitle());
         try {
+            Files.deleteIfExists(newFile);
             newFile = Files.createFile(newFile);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
