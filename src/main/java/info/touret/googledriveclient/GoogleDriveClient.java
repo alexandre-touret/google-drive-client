@@ -71,10 +71,6 @@ public class GoogleDriveClient {
                 LOGGER.fine("Checking [" + file.getTitle() + "] in [" + localFolder.toString() + "] with extension [" + file.getFileExtension() + "]");
                 Path fileToCheck = Paths.get(localFolder.toString(), file.getTitle());
                 if (isNewOrMoreRecentInGoogleDrive(file, fileToCheck.toFile())) {
-                    try {
-                        Thread.sleep(1000L);
-                    } catch (InterruptedException e) {
-                    }
                     googleDriveHelper.downloadFile(drive, file, localFolder);
                     LOGGER.fine("Downloaded file : [" + fileToCheck.toString() + " ]");
                 } else {

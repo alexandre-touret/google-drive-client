@@ -12,7 +12,6 @@ import com.google.api.services.drive.model.ParentReference;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URLConnection;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -81,13 +80,6 @@ public class GoogleDriveHelper {
      */
     public void downloadFile(Drive drive, File gdriveFile, Path folder) {
         Path newFile = Paths.get(folder.toString(), gdriveFile.getTitle());
-        try {
-            Files.deleteIfExists(newFile);
-            newFile = Files.createFile(newFile);
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            throw new GoogleDriveException(e);
-        }
         try (FileOutputStream outputStream = new FileOutputStream(newFile.toFile())) {
             drive.files().get(gdriveFile.getId()).executeMediaAndDownloadTo(outputStream);
         } catch (IOException e) {
